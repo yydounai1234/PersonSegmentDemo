@@ -1,0 +1,24 @@
+{
+	"name": "personsegmentdemo",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build": "javascript-obfuscator perform-origin.js --output perform.js --reserved-strings 'drawMatte, perform' ",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/yaox023/PersonSegmentDemo.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/yaox023/PersonSegmentDemo/issues"
+	},
+	"homepage": "https://github.com/yaox023/PersonSegmentDemo#readme",
+	"devDependencies": {
+		"javascript-obfuscator": "^4.0.0"
+	}
+}
