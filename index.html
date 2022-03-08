@@ -1,41 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>One on One Sample</title>
-  <link rel="stylesheet" href="index.css">
-  <script src="./pili-rtc-web-2.5.2-beta.3.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>One on One Sample</title>
+	<link rel="stylesheet" href="index.css">
+	<script src="./pili-rtc-web-2.5.2-beta.3.umd.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.7.0/dist/tf.min.js"></script>
 </head>
+
 <body>
-  <h1>QNRTC Web 一对一 连麦示例代码</h1>
+	<h1>QNRTC Web 一对一 连麦示例代码</h1>
 
-  <section>
-    <label>选择麦克风</label><select id="audiodevice"></select><br/>
-    <label>选择摄像头</label><select id="videodevice"></select>
-  </section>
+	<label>请输入 RoomToken 加入房间开始连麦</label>
+	<input id="roomtoken" type="text"></input>
+	<button id="joinroom">加入房间</button>
+	<p class="tips">如果您不知道如何生成 RoomToken，查看<a href="https://doc.qnsdk.com/rtn/docs/rtn_startup#4" target="_black">这里</a>
+	</p>
 
-  <label>请输入 RoomToken 加入房间开始连麦</label>
-  <input id="roomtoken" type="text"></input>
-  <button id="joinroom">加入房间</button>
-  <p class="tips">如果您不知道如何生成 RoomToken，查看<a href="https://doc.qnsdk.com/rtn/docs/rtn_startup#4" target="_black">这里</a></p>
+	<div id="trackcontainer">
+		<p>本地视频</p>
+		<div id="localvideo">
+			<canvas id="canvas2"></canvas>
+		</div>
+		<p>远端视频</p>
+		<div id="remotevideo"></div>
+	</div>
 
-  <div id="trackcontainer">
-    <p>本地视频</p>
-    <div id="localvideo">
-      <canvas id="canvas2"></canvas>
-    </div>
-    <p>远端视频</p>
-    <div id="remotevideo"></div>
-  </div>
+	<div id="process-container" style="display: none;">
+		<video id="process-video"></video>
+		<img src="bg.jpg" id="background-image">
+		<canvas id="canvas1"></canvas>
+	</div>
 
-  <div id="process-container" style="display: none">
-    <img src="bg.jpg" id="background-image">
-    <canvas id="canvas1"></canvas>
-  </div>
-
-  <script src="./index.js"></script>
+	<script src="./index.js"></script>
 </body>
+
 </html>
