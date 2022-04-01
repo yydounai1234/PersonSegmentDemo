@@ -21,7 +21,7 @@ canvas1.height = videoElement.height;
 canvas2.width = videoElement.width;
 canvas2.height = videoElement.height;
 
-let bgImageData;
+let bgImgData;
 
 
 joinRoomBtn.addEventListener("click", joinRoom);
@@ -69,7 +69,7 @@ async function publish() {
 	bgImgData = ctx1.getImageData(0, 0, canvas1.width, canvas1.height);
 
 	// 启动 ai 处理
-	perform(videoElement, canvas2, bgImageData);
+	perform(videoElement, canvas2, bgImgData);
 
 	// 从处理结果中提取 track
 	const stream = canvas2.captureStream();
