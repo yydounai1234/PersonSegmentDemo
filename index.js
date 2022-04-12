@@ -1,5 +1,6 @@
 // 获取一些页面上需要操作的 DOM 对象
 const joinRoomBtn = document.getElementById("joinroom");
+const leaveRoomBtn = document.getElementById("leaveroom");
 const roomTokenInput = document.getElementById("roomtoken");
 const audioDeviceSelect = document.getElementById("audiodevice");
 const videoDeviceSelect = document.getElementById("videodevice");
@@ -23,6 +24,15 @@ canvas2.height = videoElement.height;
 
 let bgImgData;
 
+qnPersonSegmentModel.loadModel()
+	.then(() => {
+		joinRoomBtn.innerText = "Join Room";
+		joinRoomBtn.disabled = false;
+	})
+	.catch(() => {
+		joinRoomBtn.innerText = "model load fail";
+	});
+
 
 joinRoomBtn.addEventListener("click", joinRoom);
 
@@ -32,6 +42,8 @@ const myRoom = new QNRTC.TrackModeSession();
 async function joinRoom() {
 	// 从输入框中获取 roomToken
 	const roomToken = roomTokenInput.value;
+	// const roomToken = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:pjRfsN88wY3AILmNWKuZCp7mmfM=:eyJhcHBJZCI6ImcybTB5YTd3NyIsInJvb21OYW1lIjoiMjM0MjM0MjM0MjMiLCJ1c2VySWQiOiIyMzQyMzQyMyIsImV4cGlyZUF0IjoxNjQ5ODMxNjQ0ODMwNTM2NTE5LCJwZXJtaXNzaW9uIjoidXNlciJ9"
+
 	try {
 		// 加入房间
 		const users = await myRoom.joinRoomWithToken(roomToken);
@@ -61,6 +73,9 @@ async function joinRoom() {
 	await publish();
 }
 
+
+let audioTracks;
+
 async function publish() {
 
 	// 初始化背景数据
@@ -69,13 +84,13 @@ async function publish() {
 	bgImgData = ctx1.getImageData(0, 0, canvas1.width, canvas1.height);
 
 	// 启动 ai 处理
-	perform(videoElement, canvas2, bgImgData);
+	qnPersonSegmentModel.perform(videoElement, canvas2, bgImgData);
 
 	// 从处理结果中提取 track
 	const stream = canvas2.captureStream();
 	const qntrack = QNRTC.createCustomTrack(stream.getVideoTracks()[0]);
 
-	const audioTracks = await QNRTC.deviceManager.getLocalTracks({ audio: { enabled: true } });
+	audioTracks = await QNRTC.deviceManager.getLocalTracks({ audio: { enabled: true } });
 
 	try {
 		// 发布创建的新 track
@@ -97,4 +112,9 @@ function subscribeTracks(trackInfoList) {
 			}
 		}
 	});
+}
+
+leaveRoomBtn.onclick = () => {
+	qnPersonSegmentModel.stop();
+	audioTracks[0].release();
 }

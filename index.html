@@ -7,7 +7,6 @@
 	<title>One on One Sample</title>
 	<link rel="stylesheet" href="index.css">
 	<script src="./pili-rtc-web-2.5.2-beta.3.umd.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.7.0/dist/tf.min.js"></script>
 </head>
 
 <body>
@@ -15,7 +14,8 @@
 
 	<label>请输入 RoomToken 加入房间开始连麦</label>
 	<input id="roomtoken" type="text"></input>
-	<button id="joinroom">加入房间</button>
+	<button id="joinroom" disabled>Loading Model...</button>
+	<button id="leaveroom">Leave</button>
 	<p class="tips">如果您不知道如何生成 RoomToken，查看<a href="https://doc.qnsdk.com/rtn/docs/rtn_startup#4" target="_black">这里</a>
 	</p>
 
@@ -34,8 +34,9 @@
 		<canvas id="canvas1"></canvas>
 	</div>
 
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.7.0/dist/tf.min.js"></script>
 	<!-- <script src="perform.js"></script> -->
-	<script src="perform-origin.js"></script>
+	<script src="./perform-origin.js"></script>
 	<script src="./index.js"></script>
 </body>
 
