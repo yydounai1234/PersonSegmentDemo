@@ -5,6 +5,11 @@ function log(tag) {
 	// console.log("55555", tag, t2 - t1);
 	// t1 = t2;
 }
+const webWorker = new Worker("./worker.js");
+
+webWorker.onmessage = (event) => {
+	console.log(event)
+}
 
 
 class QNPersonSegmentModel {
@@ -16,23 +21,39 @@ class QNPersonSegmentModel {
 		this.r2i = tf.tensor(0.);
 		this.r3i = tf.tensor(0.);
 		this.r4i = tf.tensor(0.);
-		this.downsample_ratio = tf.tensor(0.5);
-
+		this.downsample_ratio = tf.tensor(0.25);
 		this.shouldStop = false;
 		this.webcam = null;
+		this.videoElement = null;
 	}
 
-	async loadModel() {
+	async loadModel(videoElement) {
+		this.videoElement = videoElement
 		t1 = Date.now();
-		log("load model start");
+		console.log("load model start");
 		this.model = await tf.loadGraphModel(this.modelURL);
-		log("load model end");
+		console.log("load model end");
+		//first frame process
+		const first_frame = tf.zeros([videoElement.height, videoElement.width, 3]);
+		const src = tf.tidy(() => first_frame.expandDims(0).div(255)); // normalize input
+		const [fgr, pha, r1o, r2o, r3o, r4o] = await this.model.executeAsync(
+			{ src, r1i: this.r1i, r2i: this.r2i, r3i: this.r3i, r4i: this.r4i, downsample_ratio: this.downsample_ratio }, // provide inputs
+			["fgr", "pha", "r1o", "r2o", "r3o", "r4o"] // select outputs
+		);
+		// Dispose old tensors.
+		tf.dispose([first_frame, src, fgr, pha, this.r1i, this.r2i, this.r3i, this.r4i]);
+		// Update recurrent states.
+		[this.r1i, this.r2i, this.r3i, this.r4i] = [r1o, r2o, r3o, r4o];
 	}
 
-	async perform(videoElement, canvas, bgImgData, webcamConfig) {
+	async perform(canvas, bgImgData, webcamConfig) {
 		this.shouldStop = false;
-
-		this.webcam = await tf.data.webcam(videoElement, webcamConfig || {});
+		 navigator.mediaDevices.getUserMedia({
+			video: true
+		}).then((res) => {
+			console.log(res, 111111111111)
+		})
+		this.webcam = await tf.data.webcam(this.videoElement, webcamConfig || {});
 		log("webcam");
 
 		const drawLoop = async () => {
@@ -79,53 +100,6 @@ class QNPersonSegmentModel {
 
 const qnPersonSegmentModel = new QNPersonSegmentModel();
 
-// async function perform(videoElement, canvas, bgImgData, webcamConfig) {
-// 	console.log("start perform", videoElement, canvas, bgImgData, webcamConfig);
-// 	t1 = Date.now();
-
-// 	const webcam = await tf.data.webcam(videoElement, webcamConfig || {});
-// 	log("webcam");
-
-// 	const modelUrl = 'http://r3dg6y3l0.hd-bkt.clouddn.com/WebRTC/model/model.json';
-// 	const model = await tf.loadGraphModel(modelUrl);
-// 	log("load model");
-
-// 	// Set initial recurrent state
-// 	let [this.r1i, this.r2i, this.r3i, this.r4i] = [tf.tensor(0.), tf.tensor(0.), tf.tensor(0.), tf.tensor(0.)];
-
-// 	// Set downsample ratio
-// 	const downsample_ratio = tf.tensor(0.5);
-
-// 	const drawLoop = async () => {
-// 		await tf.nextFrame();
-// 		log("nextFrame");
-
-// 		const img = await webcam.capture();
-// 		log("capture");
-
-// 		const src = tf.tidy(() => img.expandDims(0).div(255)); // normalize input
-// 		const [fgr, pha, r1o, r2o, r3o, r4o] = await model.executeAsync(
-// 			{ src, this.r1i, this.r2i, this.r3i, this.r4i, downsample_ratio }, // provide inputs
-// 			['fgr', 'pha', 'r1o', 'r2o', 'r3o', 'r4o']   // select outputs
-// 		);
-// 		log("execute");
-
-// 		drawMatte(fgr.clone(), pha.clone(), canvas, bgImgData);
-// 		log("drawMatte");
-
-// 		// Dispose old tensors.
-// 		tf.dispose([img, src, fgr, pha, this.r1i, this.r2i, this.r3i, this.r4i]);
-
-// 		// Update recurrent states.
-// 		[this.r1i, this.r2i, this.r3i, this.r4i] = [r1o, r2o, r3o, r4o];
-
-// 		requestAnimationFrame(drawLoop);
-// 	};
-
-// 	drawLoop();
-
-// }
-
 
 async function drawMatte(fgr, pha, canvas, bgImgData) {
 	const rgba = tf.tidy(() => {
@@ -157,7 +131,4 @@ async function drawMatte(fgr, pha, canvas, bgImgData) {
 	ctx.putImageData(imageData, 0, 0);
 	rgba.dispose();
 }
-
-
-
 

@@ -24,8 +24,15 @@ canvas2.height = videoElement.height;
 
 let bgImgData;
 
-qnPersonSegmentModel.loadModel()
+qnPersonSegmentModel.loadModel(videoElement)
 	.then(() => {
+		// 初始化背景数据
+		const bgImg = document.getElementById("background-image");
+		ctx1.drawImage(bgImg, 0, 0, bgImg.width, bgImg.height, 0, 0, canvas1.width, canvas2.height);
+		bgImgData = ctx1.getImageData(0, 0, canvas1.width, canvas1.height);
+
+		// 启动 ai 处理
+		qnPersonSegmentModel.perform(canvas2, bgImgData);
 		joinRoomBtn.innerText = "Join Room";
 		joinRoomBtn.disabled = false;
 	})
@@ -77,14 +84,6 @@ async function joinRoom() {
 let audioTracks;
 
 async function publish() {
-
-	// 初始化背景数据
-	const bgImg = document.getElementById("background-image");
-	ctx1.drawImage(bgImg, 0, 0, bgImg.width, bgImg.height, 0, 0, canvas1.width, canvas2.height);
-	bgImgData = ctx1.getImageData(0, 0, canvas1.width, canvas1.height);
-
-	// 启动 ai 处理
-	qnPersonSegmentModel.perform(videoElement, canvas2, bgImgData);
 
 	// 从处理结果中提取 track
 	const stream = canvas2.captureStream();
