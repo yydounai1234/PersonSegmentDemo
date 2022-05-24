@@ -1,31 +1,28 @@
-const webpack = require('webpack')
+const WebpackObfuscator = require('webpack-obfuscator');
 module.exports = {
-  mode: 'production',
+  mode: "production",
   watch: false,
-  entry: './perform-origin.js',
+  entry: "./perform-origin.js",
   output: {
     // eslint-disable-next-line node/no-path-concat
-    path: __dirname + '/dist',
-    filename: '[name].bundle.js',
-    libraryTarget: 'umd',
-    library: 'easy',
-    umdNamedDefine: true
+    path: __dirname + "/sdk/segmented/",
+    filename: "index.js",
+    libraryTarget: "umd"
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js']
+    extensions: [".js"],
   },
-  plugins: [
-    new webpack.DefinePlugin({
-      __DEV__: false
-    })
-  ],
   module: {
     rules: [
       {
-        test: /\.ts?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/
-      }
-    ]
-  }
-}
+        test: /\.worker\.js$/,
+        use: { loader: "worker-loader" },
+      },
+    ],
+  },
+  plugins: [
+    new WebpackObfuscator ({
+        rotateStringArray: true
+    })
+]
+};

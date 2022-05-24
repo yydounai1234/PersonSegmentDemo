@@ -1,5 +1,5 @@
-const webWorker = new Worker("./worker.js");
-
+import Worker from './perform.worker.js';
+const webWorker = new Worker();
 class QNPersonSegmentModel {
   constructor() {
     this.shouldStop = false;
@@ -122,4 +122,4 @@ class QNPersonSegmentModel {
   }
 }
 
-const qnPersonSegmentModel = new QNPersonSegmentModel();
+export const qnPersonSegmentModel = new QNPersonSegmentModel();

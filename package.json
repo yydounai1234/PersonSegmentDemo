@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+		"pack": "webpack",
 		"build": "javascript-obfuscator perform-origin.js --output sdk/perform.js --reserved-strings 'videoElement,drawMatte, perform' ",
 		"worker": "javascript-obfuscator worker.js --output sdk/worker.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
@@ -20,9 +21,13 @@
 	},
 	"homepage": "https://github.com/yaox023/PersonSegmentDemo#readme",
 	"devDependencies": {
-		"javascript-obfuscator": "^4.0.0"
+		"javascript-obfuscator": "^4.0.0",
+		"webpack-cli": "^4.9.2",
+		"webpack-obfuscator": "^3.5.1",
+		"worker-loader": "^3.0.8"
 	},
 	"dependencies": {
+		"@tensorflow/tfjs": "^3.18.0",
 		"webpack": "^5.72.1"
 	}
 }
