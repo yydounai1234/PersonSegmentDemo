@@ -4,7 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"build": "javascript-obfuscator perform-origin.js --output perform.js --reserved-strings 'drawMatte, perform' ",
+		"build": "javascript-obfuscator perform-origin.js --output sdk/perform.js --reserved-strings 'videoElement,drawMatte, perform' ",
+		"worker": "javascript-obfuscator worker.js --output sdk/worker.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
@@ -20,5 +21,8 @@
 	"homepage": "https://github.com/yaox023/PersonSegmentDemo#readme",
 	"devDependencies": {
 		"javascript-obfuscator": "^4.0.0"
+	},
+	"dependencies": {
+		"webpack": "^5.72.1"
 	}
 }
