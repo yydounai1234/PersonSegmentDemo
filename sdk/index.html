@@ -11,13 +11,22 @@
 
 <body>
 	<h1>QNRTC Web 一对一 连麦示例代码</h1>
+	<h3>第一步：加载模型</h3>
+	<label for="downsample_ratio">downsample_ratio</label>
+	<select name="downsample_ratio" id="downsample_ratio">
+		<option value="0.25">0.25</option>
+		<option value="0.5">0.5</option>
+		<option value="0.75">0.75</option>
+	</select>
+	<button id="loadModel" >Loading Model</button>
+	</br>
 
-	<label>请输入 RoomToken 加入房间开始连麦</label>
+	<h3>第二步：加入房间</h3>
+	<label>RoomToken</label>
 	<input id="roomtoken" type="text"></input>
-	<button id="joinroom" disabled>Loading Model...</button>
+	<button id="joinroom" disabled>Join Room</button>
 	<button id="leaveroom">Leave</button>
-	<p class="tips">如果您不知道如何生成 RoomToken，查看<a href="https://doc.qnsdk.com/rtn/docs/rtn_startup#4" target="_black">这里</a>
-	</p>
+
 	<div id="trackcontainer">
 		<div id="localvideo" style="display: none;">
 			<video id="video" autoplay></video>
@@ -29,9 +38,6 @@
 		</div>
 		<p>远端视频</p>
 		<div id="remotevideo"></div>
-	</div>
-
-	<div id="process-container" style="display: none;">
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.7.0/dist/tf.min.js"></script>

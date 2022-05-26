@@ -55,12 +55,15 @@ class QNPersonSegmentModel {
   /**
    * 加载模型
    */
-  async loadModel(videoElement) {
+  async loadModel(videoElement, config = {
+    downsample_ratio: 0.5
+  }) {
     this.videoElement = videoElement;
     // return Promise.resolve()
     return await this.postMessage("init", {
       height: videoElement.height,
       width: videoElement.width,
+      config
     });
   }
 

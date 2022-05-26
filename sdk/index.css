@@ -36,3 +36,8 @@ section {
   height: 280px;
   z-index: -1;
 }
+
+#video {
+  width: 480px;
+  height: 280px;
+}

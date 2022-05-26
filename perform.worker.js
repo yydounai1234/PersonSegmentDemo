@@ -11,7 +11,7 @@ const init = async (data) => {
   r2i = tf.tensor(0);
   r3i = tf.tensor(0);
   r4i = tf.tensor(0);
-  downsample_ratio = tf.tensor(0.25);
+  downsample_ratio = tf.tensor(data.config.downsample_ratio);
   // console.log("load model start");
   model = await tf.loadGraphModel(modelURL);
   // console.log("load model end");
@@ -74,7 +74,7 @@ const drawMatte = async (fgr, pha, bgImgData) => {
     const pixelData = new Uint8ClampedArray(await rgba.data());
   
     // for (let i = 0; i < pixelData.length; i += 4) {
-    //   if (pixelData[i + 3] !== 255) {
+    //   if (pixelData[i + 3] <= 200) {
     //     pixelData[i] = bgImgData.data[i];
     //     pixelData[i + 1] = bgImgData.data[i + 1];
     //     pixelData[i + 2] = bgImgData.data[i + 2];
