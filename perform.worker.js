@@ -73,14 +73,14 @@ const drawMatte = async (fgr, pha, bgImgData) => {
     const [height, width] = rgba.shape.slice(0, 2);
     const pixelData = new Uint8ClampedArray(await rgba.data());
   
-    for (let i = 0; i < pixelData.length; i += 4) {
-      if (pixelData[i + 3] !== 255) {
-        pixelData[i] = bgImgData.data[i];
-        pixelData[i + 1] = bgImgData.data[i + 1];
-        pixelData[i + 2] = bgImgData.data[i + 2];
-        pixelData[i + 3] = bgImgData.data[i + 3];
-      }
-    }
+    // for (let i = 0; i < pixelData.length; i += 4) {
+    //   if (pixelData[i + 3] !== 255) {
+    //     pixelData[i] = bgImgData.data[i];
+    //     pixelData[i + 1] = bgImgData.data[i + 1];
+    //     pixelData[i + 2] = bgImgData.data[i + 2];
+    //     pixelData[i + 3] = bgImgData.data[i + 3];
+    //   }
+    // }
     const imageData = new ImageData(pixelData, width, height);
     rgba.dispose();
     return imageData;

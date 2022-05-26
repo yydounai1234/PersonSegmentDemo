@@ -13,5 +13,26 @@ section {
 }
 
 #canvas {
-  background: #000;
+  background: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 480px;
+  height: 280px;
+
+}
+
+#processvideo {
+  position:relative;
+  width: 480px;
+  height: 280px;
+}
+
+#background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 480px;
+  height: 280px;
+  z-index: -1;
 }

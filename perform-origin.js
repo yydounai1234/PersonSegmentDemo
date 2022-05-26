@@ -87,10 +87,9 @@ class QNPersonSegmentModel {
     let t1 = new Date().getTime();
     const result = await this.postMessage("perform", { imageData, bgImgData });
     let t2 = new Date().getTime();
-    // console.log(`绘制花费:${t2 - t1}ms`);
+    console.log(`绘制花费:${t2 - t1}ms`);
     const ctx = canvas.getContext("2d");
-	const imageBitmap = await createImageBitmap(result)
-    ctx.drawImage(imageBitmap, 0, 0);
+    ctx.putImageData(result, 0, 0);
     requestAnimationFrame(() => {
       this.drawImageData(canvas, video, bgImgData);
     });
@@ -102,7 +101,7 @@ class QNPersonSegmentModel {
     this.rawCanvas.height = canvas.height;
     this.rawCanvas.width = canvas.width;
     this.rawCtx = this.rawCanvas.getContext("2d");
-    navigator.mediaDevices.getUserMedia(config).then((stream) => {
+    navigator.mediaDevices.getUserMedia(config).then(async (stream) => {
       this.stream = stream;
       this.videoElement.srcObject = stream;
       requestAnimationFrame(() => {

@@ -27,7 +27,12 @@ qnPersonSegmentModel.loadModel(videoElement)
 		bgImgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
 		// 启动 ai 处理
-		qnPersonSegmentModel.perform(canvas, bgImgData);
+		qnPersonSegmentModel.perform(canvas, bgImgData,{
+			video: {
+				height: 720,
+				width: 1080
+			}
+		});
 		joinRoomBtn.innerText = "Join Room";
 		joinRoomBtn.disabled = false;
 	})
