@@ -30,7 +30,8 @@ joinRoomBtn.addEventListener("click", joinRoom);
 const myRoom = new QNRTC.TrackModeSession();
 
 async function loadModel() {
-  loadModel.disabled = true
+  loadModelBtn.disabled = true
+  loadModelBtn.innerText = "model loading";
   qnPersonSegmentModel
     .loadModel(videoElement, {
         downsample_ratio: downsample_ratio.value * 1
@@ -38,12 +39,12 @@ async function loadModel() {
     .then(() => {
 	  loadModelBtn.innerText = "model load success";
       joinRoomBtn.disabled = false;
-	  loadModel.disabled = false;
+      loadModelBtn.disabled = false;
     })
     .catch((e) => {
       console.log(e);
       loadModelBtn.innerText = "model load fail";
-	  loadModel.disabled = false
+      loadModelBtn.disabled = false
     });
 }
 
@@ -74,12 +75,7 @@ async function joinRoom() {
     bgImgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     // 启动 ai 处理
-    qnPersonSegmentModel.perform(canvas, bgImgData, {
-      video: {
-        height: 720,
-        width: 1080,
-      },
-    });
+    qnPersonSegmentModel.perform(canvas, bgImgData);
     if (users.length > 2) {
       myRoom.leaveRoom();
       alert("房间人数已满！");

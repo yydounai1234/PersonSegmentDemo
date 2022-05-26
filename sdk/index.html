@@ -15,7 +15,7 @@
 	<label for="downsample_ratio">downsample_ratio</label>
 	<select name="downsample_ratio" id="downsample_ratio">
 		<option value="0.25">0.25</option>
-		<option value="0.5">0.5</option>
+		<option value="0.5" selected>0.5</option>
 		<option value="0.75">0.75</option>
 	</select>
 	<button id="loadModel" >Loading Model</button>
@@ -32,12 +32,12 @@
 			<video id="video" autoplay></video>
 		</div>
 		<p>本地视频</p>
-		<div id="processvideo">
-			<canvas id="canvas"></canvas>
-			<img src="bg.jpg" id="background-image">
-		</div>
+		<canvas id="canvas"></canvas>
 		<p>远端视频</p>
 		<div id="remotevideo"></div>
+	</div>
+	<div style="display:none">
+		<img src="bg.jpg" id="background-image">
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.7.0/dist/tf.min.js"></script>
