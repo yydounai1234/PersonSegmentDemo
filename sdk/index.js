@@ -9,6 +9,7 @@ const remoteVideo = document.getElementById("remotevideo");
 const trackContainer = document.getElementById("trackcontainer");
 const processContainer = document.getElementById("process-container");
 const downsample_ratio = document.getElementById("downsample_ratio");
+const segmented_type = document.getElementById("segmented_type");
 const loadModelBtn = document.getElementById("loadModel");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -75,7 +76,11 @@ async function joinRoom() {
     bgImgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     // 启动 ai 处理
-    qnPersonSegmentModel.performBgImg(canvas, bgImgData);
+    if(segmented_type.value === "bgimg") {
+      qnPersonSegmentModel.performBgImg(canvas, bgImgData);
+    }else {
+      qnPersonSegmentModel.performBlur(canvas, 50);
+    }
     if (users.length > 2) {
       myRoom.leaveRoom();
       alert("房间人数已满！");

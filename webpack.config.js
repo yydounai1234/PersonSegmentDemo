@@ -16,7 +16,7 @@ module.exports = {
     rules: [
       {
         test: /\.worker\.js$/,
-        use: { loader: "worker-loader" },
+        use: { loader: "worker-loader" , options: { filename: '[hash].worker.js' }},
       },
     ],
   },

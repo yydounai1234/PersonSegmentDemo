@@ -1,11 +1,13 @@
 import Worker from './perform.worker.js';
-import { gaussBlur1 } from './perform-filter';
+import FilterWorker from './filter.worker.js';
 const webWorker = new Worker();
+const filterWorker = new FilterWorker();
 class QNPersonSegmentModel {
   constructor() {
     this.shouldStop = false;
     this.videoElement = null;
     this.messageTask = {};
+    this.filterTask = {};
     this.rawCanvas = null;
     this.rawCtx = null;
     this.stream = null;
@@ -16,6 +18,13 @@ class QNPersonSegmentModel {
       if (this.messageTask[id]) {
         this.messageTask[id].resolve(data);
         delete this.messageTask[id];
+      }
+    };
+    filterWorker.onmessage = (event) => {
+      const { id, data } = event.data;
+      if (this.filterTask[id]) {
+        this.filterTask[id].resolve(data);
+        delete this.filterTask[id];
       }
     };
   }
@@ -37,6 +46,25 @@ class QNPersonSegmentModel {
       };
     });
   }
+
+   /**
+   * 发送 webWorker 消息
+   */
+    postFilterMessage(action, data) {
+      const id = this.randomStringGen();
+      return new Promise((resolve, reject) => {
+        filterWorker.postMessage({
+          action,
+          data,
+          id,
+        });
+        this.filterTask[id] = {
+          resolve,
+          reject,
+        };
+      });
+    }
+
 
   /**
    * 转 16 进制
@@ -92,10 +120,9 @@ class QNPersonSegmentModel {
     let t1 = new Date().getTime();
     const result = await this.postMessage("perform", { imageData, bgImgData });
     let t2 = new Date().getTime();
-    // console.log(`绘制花费:${t2 - t1}ms`);
+    console.log(`绘制花费:${t2 - t1}ms`);
     const ctx = canvas.getContext("2d");
-    const bgImgDataBitImgData = await createImageBitmap(bgImgData)
-    ctx.drawImage(bgImgDataBitImgData, 0, 0)
+    ctx.drawImage(this.bgImgDataBitImgData, 0, 0)
     const imgDataBitImgData = await createImageBitmap(result)
     ctx.drawImage(imgDataBitImgData, 0, 0)
     // ctx.putImageData(result, 0, 0);
@@ -126,7 +153,7 @@ class QNPersonSegmentModel {
     );
 
     let t1 = new Date().getTime();
-    const res = await Promise.all([this.postMessage("perform", { imageData }), gaussBlur1(imageData, radius)])
+    const res = await Promise.all([this.postMessage("perform", { imageData }), this.postFilterMessage("gaussBlur", {imageData, radius})])
     const [result, bgImgData] = res
     let t2 = new Date().getTime();
     console.log(`绘制花费:${t2 - t1}ms`);
@@ -143,6 +170,7 @@ class QNPersonSegmentModel {
 
   async performBgImg(canvas, bgImgData, config = { video: true }) {
     this.shouldStop = false;
+    this.bgImgDataBitImgData = await createImageBitmap(bgImgData)
     this.rawCanvas = document.createElement("canvas");
     this.rawCanvas.height = canvas.height;
     this.rawCanvas.width = canvas.width;
