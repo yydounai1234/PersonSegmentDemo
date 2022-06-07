@@ -35,8 +35,8 @@ const init = async (data) => {
 /**
  * 实时绘制
  */
-const perform = async(imageData,bgImgData) => {
-    await tf.nextFrame();
+const perform = async(imageData) => {
+    // await tf.nextFrame();
     const img = tf.browser.fromPixels(imageData)
     const src = tf.tidy(() => img.expandDims(0).div(255));
     const [fgr, pha, r1o, r2o, r3o, r4o] = await model.executeAsync(
@@ -50,13 +50,13 @@ const perform = async(imageData,bgImgData) => {
         },
         ["fgr", "pha", "r1o", "r2o", "r3o", "r4o"]
     );
-    const data = drawMatte(fgr.clone(), pha.clone(), bgImgData);
+    const data = drawMatte(fgr.clone(), pha.clone());
     tf.dispose([img, src, fgr, pha, r1i, r2i, r3i, r4i]);
     [r1i, r2i, r3i, r4i] = [r1o, r2o, r3o, r4o];
     return data;
 }
 
-const drawMatte = async (fgr, pha, bgImgData) => {
+const drawMatte = async (fgr, pha) => {
     const rgba = tf.tidy(() => {
       const rgb =
         fgr !== null
@@ -73,14 +73,14 @@ const drawMatte = async (fgr, pha, bgImgData) => {
     const [height, width] = rgba.shape.slice(0, 2);
     const pixelData = new Uint8ClampedArray(await rgba.data());
   
-    for (let i = 0; i < pixelData.length; i += 4) {
-      if (pixelData[i + 3] <= 250) {
-        pixelData[i] = bgImgData.data[i];
-        pixelData[i + 1] = bgImgData.data[i + 1];
-        pixelData[i + 2] = bgImgData.data[i + 2];
-        pixelData[i + 3] = bgImgData.data[i + 3];
-      }
-    }
+    // for (let i = 0; i < pixelData.length; i += 4) {
+    //   if (pixelData[i + 3] <= 250) {
+    //     pixelData[i] = bgImgData.data[i];
+    //     pixelData[i + 1] = bgImgData.data[i + 1];
+    //     pixelData[i + 2] = bgImgData.data[i + 2];
+    //     pixelData[i + 3] = bgImgData.data[i + 3];
+    //   }
+    // }
     const imageData = new ImageData(pixelData, width, height);
     rgba.dispose();
     return imageData;
@@ -94,7 +94,7 @@ webWorker.addEventListener("message", async (event) => {
       webWorker.postMessage({ id });
       break;
     case "perform":
-      const imageData = await perform(data.imageData,data.bgImgData);
+      const imageData = await perform(data.imageData);
       webWorker.postMessage({ id,data: imageData });
   }
 });

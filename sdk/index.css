@@ -6,19 +6,8 @@ section {
   margin-bottom: 20px;
 }
 
-#localvideo, #remotevideo, #canvas {
-  width: 480px;
-  height: 280px;
+#localvideo, #remotevideo, #canvas,#video {
+  width: 640px;
+  height: 400px;
   background: #000;
-}
-
-#processvideo {
-  position:relative;
-  width: 480px;
-  height: 280px;
-}
-
-#video {
-  width: 480px;
-  height: 280px;
 }

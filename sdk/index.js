@@ -14,8 +14,8 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 const videoElement = document.getElementById("video");
-videoElement.width = 480;
-videoElement.height = 280;
+videoElement.width = 640;
+videoElement.height = 400;
 canvas.width = videoElement.width;
 canvas.height = videoElement.height;
 
@@ -75,7 +75,7 @@ async function joinRoom() {
     bgImgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     // 启动 ai 处理
-    qnPersonSegmentModel.perform(canvas, bgImgData);
+    qnPersonSegmentModel.performBgImg(canvas, bgImgData);
     if (users.length > 2) {
       myRoom.leaveRoom();
       alert("房间人数已满！");
@@ -133,4 +133,5 @@ function subscribeTracks(trackInfoList) {
 leaveRoomBtn.onclick = () => {
   qnPersonSegmentModel.stop();
   audioTracks[0].release();
+  myRoom.leaveRoom();
 };

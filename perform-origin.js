@@ -1,4 +1,5 @@
 import Worker from './perform.worker.js';
+import { gaussBlur1 } from './perform-filter';
 const webWorker = new Worker();
 class QNPersonSegmentModel {
   constructor() {
@@ -8,7 +9,8 @@ class QNPersonSegmentModel {
     this.rawCanvas = null;
     this.rawCtx = null;
     this.stream = null;
-
+    this.audioElement = null;
+    this.isDrawing = false;
     webWorker.onmessage = (event) => {
       const { id, data } = event.data;
       if (this.messageTask[id]) {
@@ -90,15 +92,56 @@ class QNPersonSegmentModel {
     let t1 = new Date().getTime();
     const result = await this.postMessage("perform", { imageData, bgImgData });
     let t2 = new Date().getTime();
-    console.log(`绘制花费:${t2 - t1}ms`);
+    // console.log(`绘制花费:${t2 - t1}ms`);
     const ctx = canvas.getContext("2d");
-    ctx.putImageData(result, 0, 0);
-    requestAnimationFrame(() => {
-      this.drawImageData(canvas, video, bgImgData);
-    });
+    const bgImgDataBitImgData = await createImageBitmap(bgImgData)
+    ctx.drawImage(bgImgDataBitImgData, 0, 0)
+    const imgDataBitImgData = await createImageBitmap(result)
+    ctx.drawImage(imgDataBitImgData, 0, 0)
+    // ctx.putImageData(result, 0, 0);
+    // requestAnimationFrame(() => {
+    //   this.drawImageData(canvas, video, bgImgData);
+    // });
   }
 
-  async perform(canvas, bgImgData, config = { video: true }) {
+  /**
+   * 绘制虚化图片
+   */
+  async drawBlurData(canvas, video, radius) {
+    if (this.shouldStop) {
+      return false;
+    }
+    this.rawCtx.drawImage(
+      video,
+      0,
+      0,
+      this.rawCanvas.width,
+      this.rawCanvas.height
+    );
+    const imageData = this.rawCtx.getImageData(
+      0,
+      0,
+      this.rawCanvas.width,
+      this.rawCanvas.height
+    );
+
+    let t1 = new Date().getTime();
+    const res = await Promise.all([this.postMessage("perform", { imageData }), gaussBlur1(imageData, radius)])
+    const [result, bgImgData] = res
+    let t2 = new Date().getTime();
+    console.log(`绘制花费:${t2 - t1}ms`);
+    const ctx = canvas.getContext("2d");
+    const bgImgDataBitImgData = await createImageBitmap(bgImgData)
+    ctx.drawImage(bgImgDataBitImgData, 0, 0)
+    const imgDataBitImgData = await createImageBitmap(result)
+    ctx.drawImage(imgDataBitImgData, 0, 0)
+    // ctx.putImageData(result, 0, 0);
+    // requestAnimationFrame(() => {
+    //   this.drawImageData(canvas, video, bgImgData);
+    // });
+  }
+
+  async performBgImg(canvas, bgImgData, config = { video: true }) {
     this.shouldStop = false;
     this.rawCanvas = document.createElement("canvas");
     this.rawCanvas.height = canvas.height;
@@ -107,9 +150,24 @@ class QNPersonSegmentModel {
     navigator.mediaDevices.getUserMedia(config).then(async (stream) => {
       this.stream = stream;
       this.videoElement.srcObject = stream;
-      requestAnimationFrame(() => {
-        this.drawImageData(canvas, this.videoElement, bgImgData);
-      });
+      while(this.shouldStop === false) {
+        await this.drawImageData(canvas, this.videoElement, bgImgData);
+      }
+    });
+  }
+
+  async performBlur(canvas, radius, config = { video: true }) {
+    this.shouldStop = false;
+    this.rawCanvas = document.createElement("canvas");
+    this.rawCanvas.height = canvas.height;
+    this.rawCanvas.width = canvas.width;
+    this.rawCtx = this.rawCanvas.getContext("2d");
+    navigator.mediaDevices.getUserMedia(config).then(async (stream) => {
+      this.stream = stream;
+      this.videoElement.srcObject = stream;
+      while(this.shouldStop === false) {
+        await this.drawBlurData(canvas, this.videoElement, radius);
+      }
     });
   }
 
@@ -121,6 +179,19 @@ class QNPersonSegmentModel {
         i.stop();
       }
     }
+  }
+
+  /**
+   * 执行引擎
+   */
+  run() {
+    if(this.shouldStop) {
+      return false
+    }
+    setTimeout(() => {
+      
+      this.run()
+    },30)
   }
 }
 
