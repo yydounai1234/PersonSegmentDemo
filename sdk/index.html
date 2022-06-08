@@ -6,29 +6,51 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>One on One Sample</title>
 	<link rel="stylesheet" href="index.css">
-	<script src="./pili-rtc-web-2.5.2-beta.3.umd.js"></script>
+	<script src="./pili-rtc-web-2.5.2-beta.4.umd.js"></script>
 </head>
 
 <body>
 	<h1>QNRTC Web 一对一 连麦示例代码</h1>
 	<h3>第一步：加载模型</h3>
-	<label for="downsample_ratio">downsample_ratio</label>
+	<label for="downsample_ratio">采样比例</label>
 	<select name="downsample_ratio" id="downsample_ratio">
-		<option value="0.25">0.25</option>
-		<option value="0.5" selected>0.5</option>
+		<option value="0.25" selected>0.25</option>
+		<option value="0.5">0.5</option>
 		<option value="0.75">0.75</option>
 	</select>
-	<label for="segmented_type">select type</label>
+	<br>
+	<br>
+	<label for="segmented_type">类型</label>
 	<select name="segmented_type" id="segmented_type">
 		<option value="bgimg" selected>更换背景</option>
 		<option value="blur">背景虚化</option>
 	</select>
+	<br>
+	<br>
+	<label for="radius">模糊半径</label>
+	<select name="radius" id="radius">
+		<option value="0">0</option>
+		<option value="10">10</option>
+		<option value="20" selected>20</option>
+		<option value="30">30</option>
+		<option value="40">40</option>
+		<option value="50">50</option>
+		<option value="60">60</option>
+		<option value="70">70</option>
+		<option value="80">80</option>
+		<option value="90">90</option>
+		<option value="100">100</option>
+	</select>
+	<br>
+	<br>
 	<button id="loadModel" >Loading Model</button>
 	</br>
 
 	<h3>第二步：加入房间</h3>
 	<label>RoomToken</label>
 	<input id="roomtoken" type="text"></input>
+	<br>
+	<br>
 	<button id="joinroom" disabled>Join Room</button>
 	<button id="leaveroom">Leave</button>
 

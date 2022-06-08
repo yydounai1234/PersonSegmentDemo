@@ -1,7 +1,8 @@
 import Worker from './perform.worker.js';
-import FilterWorker from './filter.worker.js';
+// import FilterWorker from './filter.worker.js';
+import * as StackBlur from './stackblur.js';
 const webWorker = new Worker();
-const filterWorker = new FilterWorker();
+// const filterWorker = new FilterWorker();
 class QNPersonSegmentModel {
   constructor() {
     this.shouldStop = false;
@@ -20,13 +21,13 @@ class QNPersonSegmentModel {
         delete this.messageTask[id];
       }
     };
-    filterWorker.onmessage = (event) => {
-      const { id, data } = event.data;
-      if (this.filterTask[id]) {
-        this.filterTask[id].resolve(data);
-        delete this.filterTask[id];
-      }
-    };
+    // filterWorker.onmessage = (event) => {
+    //   const { id, data } = event.data;
+    //   if (this.filterTask[id]) {
+    //     this.filterTask[id].resolve(data);
+    //     delete this.filterTask[id];
+    //   }
+    // };
   }
 
   /**
@@ -50,20 +51,20 @@ class QNPersonSegmentModel {
    /**
    * 发送 webWorker 消息
    */
-    postFilterMessage(action, data) {
-      const id = this.randomStringGen();
-      return new Promise((resolve, reject) => {
-        filterWorker.postMessage({
-          action,
-          data,
-          id,
-        });
-        this.filterTask[id] = {
-          resolve,
-          reject,
-        };
-      });
-    }
+    // postFilterMessage(action, data) {
+    //   const id = this.randomStringGen();
+    //   return new Promise((resolve, reject) => {
+    //     filterWorker.postMessage({
+    //       action,
+    //       data,
+    //       id,
+    //     });
+    //     this.filterTask[id] = {
+    //       resolve,
+    //       reject,
+    //     };
+    //   });
+    // }
 
 
   /**
@@ -100,7 +101,7 @@ class QNPersonSegmentModel {
   /**
    * 绘制 canvas 图片
    */
-  async drawImageData(canvas, video, bgImgData) {
+  async drawImageData(canvas, video) {
     if (this.shouldStop) {
       return false;
     }
@@ -118,13 +119,13 @@ class QNPersonSegmentModel {
       this.rawCanvas.height
     );
     let t1 = new Date().getTime();
-    const result = await this.postMessage("perform", { imageData, bgImgData });
-    let t2 = new Date().getTime();
-    console.log(`绘制花费:${t2 - t1}ms`);
+    const result = await this.postMessage("perform", { imageData });
     const ctx = canvas.getContext("2d");
     ctx.drawImage(this.bgImgDataBitImgData, 0, 0)
     const imgDataBitImgData = await createImageBitmap(result)
     ctx.drawImage(imgDataBitImgData, 0, 0)
+    let t2 = new Date().getTime();
+    // console.log(`绘制花费:${t2 - t1}ms`);
     // ctx.putImageData(result, 0, 0);
     // requestAnimationFrame(() => {
     //   this.drawImageData(canvas, video, bgImgData);
@@ -153,10 +154,8 @@ class QNPersonSegmentModel {
     );
 
     let t1 = new Date().getTime();
-    const res = await Promise.all([this.postMessage("perform", { imageData }), this.postFilterMessage("gaussBlur", {imageData, radius})])
+    const res = await Promise.all([this.postMessage("perform", { imageData }), this.blurBg(radius)])
     const [result, bgImgData] = res
-    let t2 = new Date().getTime();
-    console.log(`绘制花费:${t2 - t1}ms`);
     const ctx = canvas.getContext("2d");
     const bgImgDataBitImgData = await createImageBitmap(bgImgData)
     ctx.drawImage(bgImgDataBitImgData, 0, 0)
@@ -166,9 +165,22 @@ class QNPersonSegmentModel {
     // requestAnimationFrame(() => {
     //   this.drawImageData(canvas, video, bgImgData);
     // });
+    let t2 = new Date().getTime();
+    // console.log(`绘制花费:${t2 - t1}ms`);
   }
 
-  async performBgImg(canvas, bgImgData, config = { video: true }) {
+  async blurBg(radius) {
+    StackBlur.canvasRGBA(this.rawCanvas, 0, 0,  this.rawCanvas.width, this.rawCanvas.height, radius);
+    const imageData = this.rawCtx.getImageData(
+      0,
+      0,
+      this.rawCanvas.width,
+      this.rawCanvas.height
+    );
+    return imageData
+  }
+
+  async performImg(canvas, bgImgData, config = { video: true }) {
     this.shouldStop = false;
     this.bgImgDataBitImgData = await createImageBitmap(bgImgData)
     this.rawCanvas = document.createElement("canvas");
@@ -207,19 +219,6 @@ class QNPersonSegmentModel {
         i.stop();
       }
     }
-  }
-
-  /**
-   * 执行引擎
-   */
-  run() {
-    if(this.shouldStop) {
-      return false
-    }
-    setTimeout(() => {
-      
-      this.run()
-    },30)
   }
 }
 

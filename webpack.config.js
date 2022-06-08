@@ -1,6 +1,6 @@
 const WebpackObfuscator = require('webpack-obfuscator');
 module.exports = {
-  mode: "development",
+  mode: "production",
   watch: false,
   entry: "./perform-origin.js",
   output: {
@@ -20,9 +20,9 @@ module.exports = {
       },
     ],
   },
-//   plugins: [
-//     new WebpackObfuscator ({
-//         rotateStringArray: true
-//     })
-// ]
+  plugins: [
+    new WebpackObfuscator ({
+        rotateStringArray: true
+    })
+]
 };

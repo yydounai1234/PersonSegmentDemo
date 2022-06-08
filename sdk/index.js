@@ -9,6 +9,7 @@ const remoteVideo = document.getElementById("remotevideo");
 const trackContainer = document.getElementById("trackcontainer");
 const processContainer = document.getElementById("process-container");
 const downsample_ratio = document.getElementById("downsample_ratio");
+const radius = document.getElementById("radius");
 const segmented_type = document.getElementById("segmented_type");
 const loadModelBtn = document.getElementById("loadModel");
 const canvas = document.getElementById("canvas");
@@ -62,24 +63,24 @@ async function joinRoom() {
     // 这样就不要在前端做检查了
     // 初始化背景数据
     const bgImg = document.getElementById("background-image");
-    ctx.drawImage(
-      bgImg,
-      0,
-      0,
-      bgImg.width,
-      bgImg.height,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-    bgImgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     // 启动 ai 处理
     if(segmented_type.value === "bgimg") {
-      qnPersonSegmentModel.performBgImg(canvas, bgImgData);
+      ctx.drawImage(
+        bgImg,
+        0,
+        0,
+        bgImg.width,
+        bgImg.height,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+      bgImgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      qnPersonSegmentModel.performImg(canvas, bgImgData);
     }else {
-      qnPersonSegmentModel.performBlur(canvas, 50);
+      qnPersonSegmentModel.performBlur(canvas, radius.value * 1);
     }
     if (users.length > 2) {
       myRoom.leaveRoom();

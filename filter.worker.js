@@ -99,6 +99,6 @@ webWorker.addEventListener("message", async (event) => {
   switch (action) {
     case "gaussBlur":
       const imageData = await gaussBlur(data.imageData, data.radius);
-      webWorker.postMessage({ id,data: imageData });
+      webWorker.postMessage({ id, data: imageData });
   }
 });
